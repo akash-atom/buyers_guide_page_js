@@ -715,6 +715,15 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 
 },{}],"6rimH":[function(require,module,exports,__globalThis) {
 document.addEventListener("DOMContentLoaded", ()=>{
+    // Move href to data-href so Webflow stops managing w--current
+    document.querySelectorAll(".toc-link").forEach((link)=>{
+        const href = link.getAttribute("href");
+        if (href && href.startsWith("#")) {
+            link.setAttribute("data-href", href);
+            link.removeAttribute("href");
+            link.style.cursor = "pointer";
+        }
+    });
     window.addEventListener("unlockTOC", ()=>{
         console.log("[buyers_guide_page_js] unlockTOC: removing locked_state and showing report_wrapper");
         document.querySelectorAll(".toc-link").forEach((link)=>{
@@ -732,11 +741,44 @@ document.addEventListener("DOMContentLoaded", ()=>{
                 top,
                 behavior: "smooth"
             });
+            setTimeout(updateActiveTOC, 1000);
         }
+    });
+    let ticking = false;
+    function updateActiveTOC() {
+        const vh = window.innerHeight;
+        const entryThreshold = vh * 0.9;
+        const exitThreshold = vh * 0.05;
+        const tocLinks = document.querySelectorAll(".toc-link");
+        let activeHref = null;
+        tocLinks.forEach((link)=>{
+            const href = link.getAttribute("data-href");
+            if (!href || href === "#") return;
+            const target = document.querySelector(href);
+            if (target) {
+                const top = target.getBoundingClientRect().top;
+                if (top <= entryThreshold && top >= exitThreshold) activeHref = href;
+            }
+        });
+        tocLinks.forEach((link)=>{
+            if (link.getAttribute("data-href") === activeHref) link.classList.add("w--current");
+            else link.classList.remove("w--current");
+        });
+    }
+    window.addEventListener("scroll", ()=>{
+        if (!ticking) {
+            requestAnimationFrame(()=>{
+                updateActiveTOC();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, {
+        passive: true
     });
     document.querySelectorAll(".toc-link").forEach((link)=>{
         link.addEventListener("click", (e)=>{
-            const targetId = link.getAttribute("href");
+            const targetId = link.getAttribute("data-href");
             if (!targetId || !targetId.startsWith("#")) return;
             const targetEl = document.querySelector(targetId);
             if (targetEl) {
