@@ -1,0 +1,15 @@
+{
+  "name": "@aw-webflowbuyers_guide_page_js",
+  "version": "1.0.0",
+  
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel script.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "parcel": "^2.16.4"
+  }
+}
