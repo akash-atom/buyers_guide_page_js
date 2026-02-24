@@ -4,6 +4,16 @@ document.addEventListener("DOMContentLoaded", () => {
     .toc-link.locked_state {
       cursor: not-allowed !important;
     }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
     #toc-tooltip {
       position: fixed;
       padding: 6px 12px;
@@ -57,6 +67,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (reportWrapper) {
       reportWrapper.style.display = "flex";
     }
+
+    if (window.innerWidth <= 991) {
+      const tocLinksBlock = document.querySelector(".toc_links_block");
+      if (tocLinksBlock) {
+        tocLinksBlock.style.display = "block";
+        tocLinksBlock.style.animation = "fadeInUp 0.5s ease-out forwards";
+      }
+    }
   });
 
   window.addEventListener("showReport", () => {
@@ -108,6 +126,34 @@ document.addEventListener("DOMContentLoaded", () => {
       ticking = true;
     }
   }, { passive: true });
+
+  const aiSummary = document.querySelector("#ai_summary");
+  if (aiSummary) {
+    const originalText = aiSummary.textContent;
+    aiSummary.textContent = "";
+    let hasAnimated = false;
+
+    const summaryObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasAnimated) {
+          hasAnimated = true;
+          summaryObserver.disconnect();
+          const words = originalText.split(/\s+/);
+          let i = 0;
+          function streamWord() {
+            if (i < words.length) {
+              aiSummary.textContent += (i === 0 ? "" : " ") + words[i];
+              i++;
+              setTimeout(streamWord, 30 + Math.random() * 40);
+            }
+          }
+          streamWord();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    summaryObserver.observe(aiSummary);
+  }
 
   document.querySelectorAll(".toc-link").forEach((link) => {
     link.addEventListener("click", (e) => {
