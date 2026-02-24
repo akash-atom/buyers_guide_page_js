@@ -873,6 +873,48 @@ document.addEventListener("DOMContentLoaded", ()=>{
             }
         });
     });
+    const emailShare = document.querySelector(".email_share");
+    if (emailShare) emailShare.addEventListener("click", (e)=>{
+        e.preventDefault();
+        window.location.href = `mailto:?body=${encodeURIComponent(window.location.href)}`;
+    });
+    const linkedinShare = document.querySelector(".linkedin_share");
+    if (linkedinShare) linkedinShare.addEventListener("click", (e)=>{
+        e.preventDefault();
+        const url = encodeURIComponent(window.location.href);
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, "_blank", "width=600,height=600");
+    });
+    const copyUrl = document.querySelector(".copy_url");
+    if (copyUrl) {
+        const copiedPopup = document.createElement("div");
+        copiedPopup.textContent = "Link copied";
+        Object.assign(copiedPopup.style, {
+            position: "absolute",
+            top: "100%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            marginTop: "6px",
+            padding: "6px 12px",
+            background: "#1a1a1a",
+            color: "#fff",
+            fontSize: "12px",
+            borderRadius: "4px",
+            whiteSpace: "nowrap",
+            zIndex: "10000",
+            display: "none"
+        });
+        copyUrl.style.position = "relative";
+        copyUrl.appendChild(copiedPopup);
+        copyUrl.addEventListener("click", (e)=>{
+            e.preventDefault();
+            navigator.clipboard.writeText(window.location.href).then(()=>{
+                copiedPopup.style.display = "block";
+                setTimeout(()=>{
+                    copiedPopup.style.display = "none";
+                }, 2000);
+            });
+        });
+    }
 });
 
 },{}]},["3O61n","6rimH"], "6rimH", "parcelRequiref0d2", {})
