@@ -188,8 +188,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (linkedinShare) {
     linkedinShare.addEventListener("click", (e) => {
       e.preventDefault();
-      const url = encodeURIComponent(window.location.href);
-      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, "_blank", "width=600,height=600");
+      const url = encodeURIComponent(window.location.origin + window.location.pathname);
+      window.open(`https://www.linkedin.com/shareArticle?mini=true&url=${url}`, "_blank", "width=600,height=600");
     });
   }
 
