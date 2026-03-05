@@ -193,6 +193,80 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  document.querySelectorAll(".heading-dd_icon_wrapper").forEach((trigger) => {
+    const ddList = trigger.parentElement.querySelector(".vendor_checklist_dd-list");
+    const icon = trigger.querySelector(".report_dd_icon");
+    if (!ddList) return;
+
+    gsap.set(ddList, { height: 0, overflow: "hidden" });
+    if (icon) gsap.set(icon, { rotation: 0 });
+
+    trigger.addEventListener("click", () => {
+      const isOpen = trigger.classList.contains("is-open");
+
+      if (isOpen) {
+        gsap.to(ddList, { height: 0, duration: 0.4, ease: "power2.inOut" });
+        if (icon) gsap.to(icon, { rotation: 0, duration: 0.4, ease: "power2.inOut" });
+      } else {
+        gsap.to(ddList, { height: "auto", duration: 0.4, ease: "power2.inOut" });
+        if (icon) gsap.to(icon, { rotation: 180, duration: 0.4, ease: "power2.inOut" });
+      }
+
+      trigger.classList.toggle("is-open");
+    });
+  });
+
+  function loadHtml2Canvas() {
+    return new Promise((resolve, reject) => {
+      if (window.html2canvas) return resolve(window.html2canvas);
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+      script.onload = () => resolve(window.html2canvas);
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  document.querySelectorAll(".vendor_checklist_dropdown").forEach((dropdown, index) => {
+    const downloadBtn = dropdown.querySelector(".download_icon");
+    if (!downloadBtn) return;
+
+    downloadBtn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      try {
+        const html2canvas = await loadHtml2Canvas();
+        const headingWrapper = dropdown.querySelector(".heading-dd_icon_wrapper");
+        let logo = null;
+
+        if (headingWrapper) {
+          logo = document.createElement("img");
+          logo.src = "https://cdn.prod.website-files.com/64f08da4e7effe6dcb06d456/681c4983ea005cf43f98eb37_Logo.png";
+          logo.style.height = "24px";
+          logo.style.width = "auto";
+          logo.style.flexShrink = "0";
+          const firstChild = headingWrapper.children[0];
+          if (firstChild && firstChild.nextSibling) {
+            headingWrapper.insertBefore(logo, firstChild.nextSibling);
+          } else {
+            headingWrapper.appendChild(logo);
+          }
+          await new Promise((r) => { logo.onload = r; logo.onerror = r; });
+        }
+
+        const canvas = await html2canvas(dropdown, { useCORS: true, scale: 2 });
+
+        if (logo) logo.remove();
+
+        const link = document.createElement("a");
+        link.download = `vendor-checklist-${index + 1}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch (err) {
+        console.error("Screenshot failed:", err);
+      }
+    });
+  });
+
   const copyUrl = document.querySelector(".copy_url");
   if (copyUrl) {
     const copiedPopup = document.createElement("div");
