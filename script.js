@@ -199,17 +199,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!ddList) return;
 
     gsap.set(ddList, { height: 0, overflow: "hidden" });
-    if (icon) gsap.set(icon, { rotation: 0 });
+    if (icon) gsap.set(icon, { rotation: 180 });
 
     trigger.addEventListener("click", () => {
       const isOpen = trigger.classList.contains("is-open");
 
       if (isOpen) {
         gsap.to(ddList, { height: 0, duration: 0.4, ease: "power2.inOut" });
-        if (icon) gsap.to(icon, { rotation: 0, duration: 0.4, ease: "power2.inOut" });
+        if (icon) gsap.to(icon, { rotation: 180, duration: 0.4, ease: "power2.inOut" });
       } else {
         gsap.to(ddList, { height: "auto", duration: 0.4, ease: "power2.inOut" });
-        if (icon) gsap.to(icon, { rotation: 180, duration: 0.4, ease: "power2.inOut" });
+        if (icon) gsap.to(icon, { rotation: 0, duration: 0.4, ease: "power2.inOut" });
       }
 
       trigger.classList.toggle("is-open");
@@ -227,6 +227,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const screenshotNames = [
+    "Atomicwork_ITSM_vendor_questions_AI_and_Automation",
+    "Atomicwork_ITSM_vendor_questions_ITSM",
+    "Atomicwork_ITSM_vendor_questions_Security",
+    "Atomicwork_ITSM_vendor_questions_ESM",
+  ];
+
   document.querySelectorAll(".vendor_checklist_dropdown").forEach((dropdown, index) => {
     const downloadBtn = dropdown.querySelector(".download_icon");
     if (!downloadBtn) return;
@@ -235,30 +242,19 @@ document.addEventListener("DOMContentLoaded", () => {
       e.stopPropagation();
       try {
         const html2canvas = await loadHtml2Canvas();
-        const headingWrapper = dropdown.querySelector(".heading-dd_icon_wrapper");
-        let logo = null;
-
-        if (headingWrapper) {
-          logo = document.createElement("img");
-          logo.src = "https://cdn.prod.website-files.com/64f08da4e7effe6dcb06d456/681c4983ea005cf43f98eb37_Logo.png";
-          logo.style.height = "24px";
-          logo.style.width = "auto";
-          logo.style.flexShrink = "0";
-          const firstChild = headingWrapper.children[0];
-          if (firstChild && firstChild.nextSibling) {
-            headingWrapper.insertBefore(logo, firstChild.nextSibling);
-          } else {
-            headingWrapper.appendChild(logo);
-          }
-          await new Promise((r) => { logo.onload = r; logo.onerror = r; });
-        }
+        const logo = document.createElement("img");
+        logo.src = "https://cdn.prod.website-files.com/64f08da4e7effe6dcb06d456/681c4983ea005cf43f98eb37_Logo.png";
+        logo.style.width = "150px";
+        logo.style.height = "auto";
+        dropdown.appendChild(logo);
+        await new Promise((r) => { logo.onload = r; logo.onerror = r; });
 
         const canvas = await html2canvas(dropdown, { useCORS: true, scale: 2 });
 
-        if (logo) logo.remove();
+        logo.remove();
 
         const link = document.createElement("a");
-        link.download = `vendor-checklist-${index + 1}.png`;
+        link.download = `${screenshotNames[index] || "vendor-checklist"}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
       } catch (err) {
